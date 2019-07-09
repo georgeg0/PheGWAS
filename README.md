@@ -24,11 +24,14 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("biomaRt")
 ```
 ## Installation of PheGWAS package
-Download the latest Zipped version via this link: 
+If you downloaded the tar version of the package
 
-Or if you have the zipped version of the package then
+```
+install.packages("/Users/sushrimagan/Downloads/PheGWAS_0.1.0.tgz",dependencies = TRUE, repos = NULL)
+```
 
-Untar /unzip the file and pass the folder name to 
+Or if you have the unzipped version of the package then
+
 ```
 devtools::install("<path to package folder name>", dependencies=TRUE)
 ```
@@ -36,19 +39,20 @@ Eg:
 ```
 devtools::install("/Users/sushrimagan/Downloads/PheGWAS-master",dependencies = TRUE)
 ```
-for tar version 
-```
-install.packages("/Users/sushrimagan/Downloads/PheGWAS_0.1.0.tgz",dependencies = TRUE, repos = NULL)
-```
 
 # Brief Documentation:
 ## Interactive PheGWAS landscape mode features:
-•	X axis: Chromosome (level 1) and base pair positions (level 2)
-•	Y axis: The phenotypes name 
-•	Z axis: -log10(p-value) or other values such as the effect size can be specified
-•	Info pop-up: Hovering over a point reveals information about the plotted SNP, the information includes Phenotype name, kbp position range, P value, Locus, SNP ID, Gene. The GENE name is mapped to the corresponding SNPID within the package by making use of the R package “BioMArt”.
-•	Interactive features like zoom in, zoom out, turntable rotation, rotation on an axis and pan scale features.
-•	The figure can be exported as static or interactive plot (which is recommended), unorder to share with colleagues.
+•	X axis: Chromosome (level 1) and base pair positions (level 2). 
+
+•	Y axis: The phenotypes name. 
+
+•	Z axis: -log10(p-value) or other values such as the effect size can be specified. 
+
+•	Info pop-up: Hovering over a point reveals information about the plotted SNP, the information includes Phenotype name, kbp position range, P value, Locus, SNP ID, Gene. The GENE name is mapped to the corresponding SNPID within the package by making use of the R package “BioMArt”.  
+
+•	Interactive features like zoom in, zoom out, turntable rotation, rotation on an axis and pan scale features.  
+
+•	The figure can be exported as static or interactive plot (which is recommended), unorder to share with colleagues.  
 
 ## Exploring the GWAS summary data with PheGWAS:
 ### Preprocessing the dataframe’s:
