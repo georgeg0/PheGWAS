@@ -1,7 +1,7 @@
 # PheGWAS: R package for ‘many phenotypes many variant’ visualization
 
 # Introduction:
-GWAS is Genome Wide association study which is done on many variants and one phenotype. The Manhattan plot is the popular way to visualize this (https://www.r-graph-gallery.com/wp-content/uploads/2018/02/Manhattan_plot_in_R.html ). On the other hand, PheWAS (https://rdrr.io/github/PheWAS/PheWAS/ ) is phenome wide association study which is done on a single variant and many phenotypes. PheGWAS is a new concept to do analysis on many variants and many phenotypes. This is a package to do interactive 3D visualization on many variants many phenotypes.
+GWAS is Genome Wide Association Study which is done on many variants and one phenotype. The Manhattan plot is the popular way to visualize this (https://www.r-graph-gallery.com/wp-content/uploads/2018/02/Manhattan_plot_in_R.html ). On the other hand, PheWAS (https://rdrr.io/github/PheWAS/PheWAS/ ) is phenome wide association study which is done on a single variant and many phenotypes. PheGWAS is a new concept to do analysis on many variants and many phenotypes. This is a package to do interactive 3D visualization on many variants many phenotypes.
 
 # Installation:
 ## Prerequisites
@@ -25,9 +25,12 @@ BiocManager::install("biomaRt")
 ```
 ## Installation of PheGWAS package
 If you downloaded the tar version of the package
-
 ```
-install.packages("/Users/sushrimagan/Downloads/PheGWAS_0.1.0.tgz",dependencies = TRUE, repos = NULL)
+install.packages("<path to the tar>",dependencies = TRUE, repos = NULL)
+```
+Eg:
+```
+install.packages("/Downloads/PheGWAS_0.1.0.tgz",dependencies = TRUE, repos = NULL)
 ```
 
 Or if you have the unzipped version of the package then
@@ -37,7 +40,7 @@ devtools::install("<path to package folder name>", dependencies=TRUE)
 ```
 Eg:
 ```
-devtools::install("/Users/sushrimagan/Downloads/PheGWAS-master",dependencies = TRUE)
+devtools::install("/Downloads/PheGWAS-master",dependencies = TRUE)
 ```
 
 # Brief Documentation:
@@ -52,7 +55,7 @@ devtools::install("/Users/sushrimagan/Downloads/PheGWAS-master",dependencies = T
 
 •	Interactive features like zoom in, zoom out, turntable rotation, rotation on an axis and pan scale features.  
 
-•	The figure can be exported as static or interactive plot (which is recommended), unorder to share with colleagues.  
+•	The figure can be exported as static or interactive plot (which is recommended), in order to share with colleagues.  
 
 ## Exploring the GWAS summary data with PheGWAS:
 ### Preprocessing the dataframe’s:
@@ -60,7 +63,7 @@ The first stage of the exploration is to prepare the dataframe to pass to the Ph
 
 List of the GWAS summary stats files as dataframe’s are passed to this function, the GWAS summary stats file is to be of this format. 
 
-If no gene to rsid is not available. Gene will be mapped internally with the BioMart Module
+If gene to rsid is not available. Gene will be mapped internally with the BioMart Module
 ```
 CHR        BP       rsid <pvalue of the phenotype>
 ```
@@ -73,9 +76,9 @@ Here the p-value column name must be replaced by phenotype name, this column nam
 The PheGWAS exploration is undertaken in different levels (as of now its 2 different levels). The exploration is done using function “landscape”
 
 ### Level 1: Exploration on entire genome level:
-The first level is the entire chromosome level. In this level the entire chromosome is plotted in a 3D landscape view with each peak in the chromosome represent the highest pvalue in that chromosome. The x axis here is the chromosome number. Y axis and Z axis are phenotype name and -log10(p-value) respectively.
+The first level is the entire chromosome level. In this level the entire chromosome is plotted in a 3D landscape view with each peak in the chromosome representing the highest pvalue in that chromosome. The x axis here is the chromosome number. Y axis and Z axis are phenotype name and -log10(p-value) respectively.
 
-With this visualization the user gets an idea which chromosome contribute to multiple phenotypes. A chromosome contributing to multiple phenotypes doesn’t mean anything, as we are more interested to see if a certain region within the chromosome is contributing to multiple phenotypes. This is where the exploration is taken to the next level of the PheGWAS.
+With this visualization the user gets an idea which chromosome contribute to multiple phenotypes. A chromosome contributing to multiple phenotypes has to be explored, as we are more interested to see if a certain region within the chromosome is contributing to multiple phenotypes. This is where the exploration is taken to the next level of the PheGWAS.
 
 ### Level 2: Exploration on individual chromosomes:
 The second level is the single chromosome level. In this level the entire chromosome is divided into different groups based on bp units given by the user (100kbp is the default). The x axis here is the BP groups in the chromosome. Y axis and Z axis are phenotype name and -log10(p-value) respectively.
@@ -84,10 +87,10 @@ The second level is the single chromosome level. In this level the entire chromo
 The 6 different data frames from 2 different consortium are made available in the package for getting used to the package and its usage.
 
 ## Following processed summary data are from the lipid consortium:
-Hdl - HDL GWAS summary dataset
-Ldl - LDL GWAS summary dataset
-Trigs - TRIG GWAS summary dataset
-Tchol - TOTAL CHOLESTROL GWAS summary dataset
+hdl - HDL GWAS summary dataset
+ldl - LDL GWAS summary dataset
+trigs - TRIG GWAS summary dataset
+tchol - TOTAL CHOLESTROL GWAS summary dataset
 
 Results are from H. Grallert et al., “Discovery and refinement of loci associated with lipid levels,” Nat. Genet., vol. 45, no. 11, pp. 1274–1283, 2013.
 
