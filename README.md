@@ -49,9 +49,9 @@ devtools::install("/Downloads/PheGWAS-master",dependencies = TRUE)
 ## Interactive PheGWAS landscape mode features:
 •	X axis: Chromosome (level 1) and base pair positions (level 2). 
 
-•	Y axis: The phenotypes name. 
+•	Z axis: The phenotypes name. 
 
-•	Z axis: -log10(p-value) or other values such as the effect size can be specified. 
+•	Y axis: -log10(p-value) or other values such as the effect size can be specified. 
 
 •	Info pop-up: Hovering over a point reveals information about the plotted SNP, the information includes Phenotype name, kbp position range, P value, Locus, SNP ID, Gene. The GENE name is mapped to the corresponding SNPID within the package by making use of the R package “BioMArt”.  
 
@@ -78,12 +78,12 @@ Here the p-value column name must be replaced by phenotype name, this column nam
 The PheGWAS exploration is undertaken in different levels (as of now its 2 different levels). The exploration is done using function “landscape”
 
 ### Level 1: Exploration on entire genome level:
-The first level is the entire chromosome level. In this level the entire chromosome is plotted in a 3D landscape view with each peak in the chromosome representing the highest pvalue in that chromosome. The x axis here is the chromosome number. Y axis and Z axis are phenotype name and -log10(p-value) respectively.
+The first level is the entire genome level. In this level the entire chromosomes are plotted in a 3D landscape view with each peak in the chromosome representing the highest pvalue in that chromosome. The X axis here is the chromosome number. Z axis and Y axis are phenotype name and -log10(p-value) respectively.
 
 With this visualization the user gets an idea which chromosome contribute to multiple phenotypes. A chromosome contributing to multiple phenotypes has to be explored, as we are more interested to see if a certain region within the chromosome is contributing to multiple phenotypes. This is where the exploration is taken to the next level of the PheGWAS.
 
 ### Level 2: Exploration on individual chromosomes:
-The second level is the single chromosome level. In this level the entire chromosome is divided into different groups based on bp units given by the user (100kbp is the default). The x axis here is the BP groups in the chromosome. Y axis and Z axis are phenotype name and -log10(p-value) respectively.
+The second level is the single chromosome level. In this level the entire chromosome is divided into different groups based on bp units given by the user (100kbp is the default). The x axis here is the BP groups in the chromosome. Z axis and Y axis are phenotype name and -log10(p-value) respectively.
 
 # Examples:
 The 6 different data frames from 2 different consortium are made available in the package for getting used to the package and its usage.
