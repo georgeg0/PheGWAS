@@ -1,4 +1,4 @@
-# PheGWAS: R package for ‘many phenotypes many variant’ visualization
+# PheGWAS: Three-dimensional approach to dynamically visualize GWAS across multiple phenotypes
 
 # Introduction:
 GWAS is Genome Wide Association Study which is done on many variants and one phenotype. The Manhattan plot is the popular way to visualize this( https://github.com/stephenturner/qqman ). On the other hand, PheWAS (https://rdrr.io/github/PheWAS/PheWAS/ ) is phenome wide association study which is done on a single variant and many phenotypes. PheGWAS is a new concept to do analysis on many variants and many phenotypes. This is a package to do interactive 3D visualization on many variants many phenotypes.
