@@ -57,7 +57,7 @@ processphegwas <- function(x) {
   }
   d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
   d <- d[order(d$CHR, d$BP), ]
-  d$logp <- -log10(d$P)
+  d$logp <- round(-log10(d$P),3)
   d$logp[is.infinite(d$logp)] <- max(d$logp[!is.infinite(d$logp)],na.rm = TRUE) + 10
   d
 }
@@ -120,7 +120,7 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
     for (i in 1:nrow(gwas_surface_copy_full_use)) {
       for (j in 1:ncol(gwas_surface_copy_full_use))
         gwas_surface_copy_full_use[i, j] <-
-          paste("Phenotype = ", rownames(gwas_surface_copy_full_use)[i], '\n',"Chromosome = ", colnames(gwas_surface_copy_full_use)[j],'\n',"P value = ", gwas_surface_copy_full_use[i, j],'\n',
+          paste("Phenotype = ", rownames(gwas_surface_copy_full_use)[i], '\n',"Chromosome = ", colnames(gwas_surface_copy_full_use)[j],'\n',"-log10 (P-value) = ", gwas_surface_copy_full_use[i, j],'\n',
                 "SNPID =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$SNP,'\n',
                 "Gene =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$gene)
     }
@@ -130,7 +130,7 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
       layout(title = 'FIGIWAS',scene = list(yaxis = list(title = "Phenotypes", tickmode = "array",nticks = 8),xaxis =list(title= "Chromosomes",autotick = F, dtick = 1),
                                               zaxis =list(title= "-log 10(P)",range=c(sliceval,upperlimit+2)),aspectmode = "manual",aspectratio = list( x = 1.8, y = 1, z = 1))) %>%
       add_trace(x=colnames(gwas_surface_prime_full_use),y= rownames(gwas_surface_prime_full_use),z = gwas_surface_prime_full_use, type = "surface",surfacecolor = gwas_surface_full_use,showscale = FALSE,
-                text = gwas_surface_copy_full_use,hoverinfo = "text",cmin = sliceval,cmax = upperlimit) %>% colorbar(title = "P Value")
+                text = gwas_surface_copy_full_use,hoverinfo = "text",cmin = sliceval,cmax = upperlimit) %>% colorbar(title = "-log10 (P-value)")
     p
 
   }
@@ -173,7 +173,7 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
     for (i in 1:nrow(gwas_surface_copy_use)) {
       for (j in 1:ncol(gwas_surface_copy_use))
         gwas_surface_copy_use[i, j] <-
-          paste("Phenotype = ", rownames(gwas_surface_copy_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_copy_use)[j],'\n',"P value = ", gwas_surface_copy_use[i, j],'\n',"SNPID =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$SNP,"\n","Gene =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$gene)
+          paste("Phenotype = ", rownames(gwas_surface_copy_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_copy_use)[j],'\n',"-log10 (P-value) = ", gwas_surface_copy_use[i, j],'\n',"SNPID =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$SNP,"\n","Gene =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$gene)
     }
 
     #### the new surfece for gene logic
