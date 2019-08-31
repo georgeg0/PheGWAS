@@ -14,13 +14,18 @@ landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
 
 \item{chromosome}{Integer to indicate the chromosome number thats interested, If not given entire chromosome is given}
 
-\item{bpdivision}{Integer value to indicate the base pair divisions. By default it is 100,000 bp. This vis only applciable on a single chromosome view. For entire
+\item{bpdivision}{Integer value to indicate the base pair divisions. By default it is 100,000 bp. This vis only applciable on a single chromosome view. For entire}
+
+\item{upperlimit}{Integer to indicate value of -log10(p) to do the upperlimit. If not given it will take the max -log10(p)}
+
+\item{geneview}{This checks for the common genes across the section
 chromosoem view the max peak is selected}
 }
 \description{
 Interactive 3-D association landscape for many phenotypes
 }
 \examples{
+x <- list(hdl,ldl,trig,tchol)
 y <- processphegwas(x)
 ## pass the dataframe from the processphegwas
 
@@ -31,10 +36,10 @@ landscape(y)
 landscape(y,sliceval = 6)
 
 # 3D landscape visualization of chromosome number 16
-landscape(x,sliceval = 6,chromosome = 16)
+landscape(y,sliceval = 6,chromosome = 16)
 
-# 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 100,000)
-landscape(x,sliceval = 6,chromosome = 16,bpdivision = 1,000,000)
+# 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
+landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
 }
 \author{
 George Gittuuuuu

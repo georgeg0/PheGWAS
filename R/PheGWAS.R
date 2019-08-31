@@ -1,6 +1,7 @@
 
 # once added the roxygen syntax things then run following
 # devtools::document()
+BP <- CHR <- P <- PHENO <- SNP <- gene <- lab <- logp <- NULL
 
 ## Function to add gene for repective rsid, if genes are not provided by user
 addgene <- function(gwasmulti){
@@ -66,15 +67,18 @@ processphegwas <- function(x) {
 #' @import tidyverse
 #' @import tidyr
 #' @import plotly
-#' @import biomaRt
+#' @importFrom biomaRt useMart getBM
 #' @import reshape2
 #' @param d DataFrame output from processphegwas
 #' @param sliceval Integer to indicate value of -log10(p) to do the sectionalcut. Usually value > -log10 6 is considered to be significant
 #' @param chromosome Integer to indicate the chromosome number thats interested, If not given entire chromosome is given
 #' @param bpdivision Integer value to indicate the base pair divisions. By default it is 100,000 bp. This vis only applciable on a single chromosome view. For entire
+#' @param upperlimit Integer to indicate value of -log10(p) to do the upperlimit. If not given it will take the max -log10(p)
+#' @param geneview This checks for the common genes across the section
 #' chromosoem view the max peak is selected
 #' @author George Gittuuuuu
 #' @examples
+#' x <- list(hdl,ldl,trig,tchol)
 #' y <- processphegwas(x)
 #' ## pass the dataframe from the processphegwas
 #'
@@ -85,10 +89,10 @@ processphegwas <- function(x) {
 #' landscape(y,sliceval = 6)
 #'
 #' # 3D landscape visualization of chromosome number 16
-#' landscape(x,sliceval = 6,chromosome = 16)
+#' landscape(y,sliceval = 6,chromosome = 16)
 #'
-#' # 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 100,000)
-#' landscape(x,sliceval = 6,chromosome = 16,bpdivision = 1,000,000)
+#' # 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
+#' landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
 #' @export
 landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, upperlimit = NULL,geneview = FALSE) {
 
@@ -147,7 +151,6 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
 
     if(nrow(gwasmulti) == 0){
       print("There are no SNP'S above this logp threshold, try decreasing the logp value")
-      break;
     }
     if(length(grep("gene", colnames(d))) == 0){
       print("Applying BioMArt module for matching gene to rsid")
@@ -238,7 +241,7 @@ if(geneview == TRUE){
 #' @import tidyverse
 #' @import tidyr
 #' @import plotly
-#' @import biomaRt
+#' @importFrom biomaRt useMart getBM
 #' @import reshape2
 #' @param d DataFrame output from processphegwas
 #' @param sliceval Integer to indicate value of -log10(p) to do the sectionalcut. Usually value > -log10 6 is considered to be significant
@@ -248,7 +251,9 @@ if(geneview == TRUE){
 #' @author George Gittu
 #' @examples
 #' # table of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
-#' landscapetable(x,sliceval = 6,chromosome = 16,bpdivision = 1,000,000)
+#' x <- list(hdl,ldl,trig,tchol)
+#' y <- processphegwas(x)
+#' landscapetable(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
 #' @export
 landscapetable <- function(d, sliceval = 8, chromosome=1, bpdivision= 1000000) {
   paste0("Processing for the chromosome number ", chromosome)
@@ -264,7 +269,6 @@ landscapetable <- function(d, sliceval = 8, chromosome=1, bpdivision= 1000000) {
     slice(which.max(logp))
 if(nrow(gwasmulti) == 0){
   print("There are no SNP'S above this logp threshold, try decreasing the logp value")
-  break;
 }
   if(length(grep("gene", colnames(d))) == 0){
     print("Applying BioMArt module for matching gene to rsid")
