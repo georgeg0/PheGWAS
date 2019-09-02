@@ -5,7 +5,7 @@
 \title{Interactive 3-D association landscape for many phenotypes}
 \usage{
 landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
-  upperlimit = NULL, geneview = FALSE)
+  upperlimit = NULL, geneview = FALSE, betaplot = FALSE)
 }
 \arguments{
 \item{d}{DataFrame output from processphegwas}
@@ -18,7 +18,9 @@ landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
 
 \item{upperlimit}{Integer to indicate value of -log10(p) to do the upperlimit. If not given it will take the max -log10(p)}
 
-\item{geneview}{This checks for the common genes across the section
+\item{geneview}{This checks for the common genes across the section}
+
+\item{betaplot}{This plot the beta instad of pvalue in the yaxis. The heat map layer is based on the pvalue.
 chromosoem view the max peak is selected}
 }
 \description{
@@ -26,7 +28,8 @@ Interactive 3-D association landscape for many phenotypes
 }
 \examples{
 x <- list(hdl,ldl,trig,tchol)
-y <- processphegwas(x)
+phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
+y <- processphegwas(x, phenos)
 ## pass the dataframe from the processphegwas
 
 # 3D landscape visualization of all the phenotypes across the base pair positions
@@ -40,6 +43,7 @@ landscape(y,sliceval = 6,chromosome = 16)
 
 # 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
 landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
+landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000, betaplot = TRUE)
 }
 \author{
 George Gittuuuuu

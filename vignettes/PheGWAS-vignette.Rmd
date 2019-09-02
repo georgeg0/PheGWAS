@@ -1,0 +1,85 @@
+---
+title: "Intro to the PheGWAS package"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{PheGWAS-vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{dplyr}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",fig.width=12, fig.height=9, message=FALSE, tidy=TRUE, dpi=75)
+```
+
+```{r setup}
+library(PheGWAS)
+```
+
+Following processed summary data are from the lipid consortium:
+
+```{r}
+head(hdl)
+```
+```{r}
+head(ldl)
+```
+```{r}
+head(trig)
+```
+```{r}
+head(tchol)
+```
+
+Following processed summary data are from the giant consortium:
+
+```{r}
+head(bmimen)
+```
+```{r}
+head(bmiwomen)
+```
+
+The dataframe’s are passed to processphegwas function as a list of dataframe’s.
+
+```{r}
+x <- list(hdl,ldl,trig,tchol)
+phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
+```
+
+This preprocess the dataframes’ for passing to the landscape function.
+```{r}
+y <- processphegwas(x,phenos)
+```
+
+3D landscape visualization of all the phenotypes across the base pair #positions
+```{r}
+landscape(y)
+```
+
+3D landscape visualization of all the phenotypes across the base pair #positions, showing only the crusts above a certain threshold
+```{r}
+landscape(y,sliceval = 10)
+```
+
+3D landscape visualization of all the phenotypes across the base pair #positions, showing only the crusts that are within a certain region (between sliceval and upperlimit)
+```{r}
+landscape(y,sliceval = 10 ,chromosome = 19,upperlimit = 50)
+```
+
+3D landscape visualization of chromosome number 16, with bp division on #1,000,000 (default is 1,000,000)
+```{r}
+landscape(y,sliceval = 7.5,chromosome = 19)
+```
+
+3D landscape visualization of chromosome number 16, with bp division on #1,000,000. Gene View is active
+```{r}
+landscape(y,sliceval = 7.5,chromosome = 19, geneview = TRUE)
+```
+
+Effect size plot
+```{r}
+landscape(y,sliceval = 7.5,chromosome = 16,bpdivision = 1000000, betaplot = TRUE)
+```

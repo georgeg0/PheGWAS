@@ -4,10 +4,12 @@
 \alias{processphegwas}
 \title{Prepare the dataframe to pass to landscape function}
 \usage{
-processphegwas(x)
+processphegwas(x, phenos)
 }
 \arguments{
 \item{x}{List of dataframes that need to do PheGWAS on. Arrange the dataframe in the order how the the phenotypes should align in y axis}
+
+\item{phenos}{a vector of phenotypes that you are passing for in the summary statistics file. It should be in the order that you pass the List.}
 }
 \value{
 A processed dataframe to pass to PheGWAS function
@@ -19,10 +21,12 @@ Prepare the dataframe to pass to landscape function
 Make sure there are no duplicate rsid's in any of the dataframe, If there aremake sure to resolve it before passing it to this function.
 }
 \examples{
-x <- list(bmimen,bmiwomen)
-
+\dontrun{
+x <- list(hdl,ldl,trig,tchol)
+phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
 ## y is ready to be passed to function landscape
-y <- processphegwas(x)
+y <- processphegwas(x, phenos)
+}
 }
 \author{
 George Gittu

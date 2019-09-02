@@ -3,6 +3,7 @@
 export(landscape)
 export(landscapetable)
 export(processphegwas)
+import(dplyr)
 import(plotly)
 import(reshape2)
 import(tidyr)

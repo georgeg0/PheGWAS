@@ -1,7 +1,7 @@
 
 # once added the roxygen syntax things then run following
 # devtools::document()
-BP <- CHR <- P <- PHENO <- SNP <- gene <- lab <- logp <- NULL
+BP <- CHR <- P <- PHENO <- SNP <- gene <- lab <- logp <- Entire_Val <- NULL
 
 ## Function to add gene for repective rsid, if genes are not provided by user
 addgene <- function(gwasmulti){
@@ -28,36 +28,55 @@ addgene <- function(gwasmulti){
 #'
 #' @import tidyverse
 #' @import tidyr
+#' @import dplyr
 #' @param x List of dataframes that need to do PheGWAS on. Arrange the dataframe in the order how the the phenotypes should align in y axis
+#' @param phenos a vector of phenotypes that you are passing for in the summary statistics file. It should be in the order that you pass the List.
 #' @return A processed dataframe to pass to PheGWAS function
 #' @details Make sure there are no duplicate rsid's in any of the dataframe, If there aremake sure to resolve it before passing it to this function.
 #' @author George Gittu
 #' @examples
-#' x <- list(bmimen,bmiwomen)
-#'
+#' \dontrun{
+#' x <- list(hdl,ldl,trig,tchol)
+#' phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
 #' ## y is ready to be passed to function landscape
-#' y <- processphegwas(x)
+#' y <- processphegwas(x, phenos)
+#' }
 #' @export
-processphegwas <- function(x) {
+processphegwas <- function(x,phenos) {
+  #rename the column for not to get duplicate column names
+  for(i in 1:length(x))
+  {
+    x[[i]] <- x[[i]] %>% rename_at(vars(-(1:5)), ~ paste0(phenos[i],"_",.))
+  }
 
-  fulldf <- Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = c("CHR","BP","rsid"), all = TRUE),x)
+  fulldf <- Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = c("CHR","BP","rsid","A1","A2"), all = TRUE),x)
 
   if(length(grep("gene", colnames(fulldf))) > 0){
     ## means it got gene added by the user
     print("Processing for gene provided by the user")
     fulldf$G <- apply(fulldf[, grep("gene", colnames(fulldf))], 1, function(x) paste(unique(unlist(strsplit(x[!is.na(x)], ";"))), collapse = ";"))
-    fulldfff <- fulldf[, -grep("gene", colnames(fulldf))]
-    gwasmulti.melt <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","G"), variable.name = "color", value.name = "p_value")
-    d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, P = gwasmulti.melt$p_value,SNP = gwasmulti.melt$rsid,gene = gwasmulti.melt$G,PHENO = gwasmulti.melt$color)
+    fullinterm <- fulldf[, -grep("gene", colnames(fulldf))]
+    ##Doing the merge of columns
+    for(i in 1:length(x))
+    {
+      cccc <- colnames(fullinterm)[grepl( phenos[i], names( fullinterm ) ) ]
+      fullinterm <- unite_(fullinterm,phenos[i], cccc, sep = "and", remove = FALSE)
+    }
+    fulldfff <- fullinterm[, -grep("_", colnames(fullinterm))]
+    gwasmulti.meltF <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","A1","A2","G"), variable.name = "color", value.name = "Entire_Val")
+    gwasmulti.melt <- gwasmulti.meltF %>% separate(Entire_Val, c("BETA", "SE","p_value"), "and")
+    d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, A1 = gwasmulti.melt$A1, A2 = gwasmulti.melt$A2, SNP = gwasmulti.melt$rsid ,P = as.numeric(gwasmulti.melt$p_value),BETA = as.numeric(gwasmulti.melt$BETA),SE = as.numeric(gwasmulti.melt$SE),gene = gwasmulti.melt$G,PHENO = gwasmulti.melt$color)
   }else{
     ## Gene when not addded
     print("Gene will be added as part of BioMart module")
-  gwasmulti.melt <- reshape2::melt(data = fulldf, id.vars = c("CHR","BP","rsid"), variable.name = "color", value.name = "p_value")
-  d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, P = gwasmulti.melt$p_value,SNP = gwasmulti.melt$rsid,PHENO = gwasmulti.melt$color)
+    gwasmulti.meltF <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","A1","A2"), variable.name = "color", value.name = "Entire_Val")
+    gwasmulti.melt <- gwasmulti.meltF %>% separate(Entire_Val, c("BETA", "SE","p_value"), "and")
+    d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, A1 = gwasmulti.melt$A1, A2 = gwasmulti.melt$A2, SNP = gwasmulti.melt$rsid ,P = as.numeric(gwasmulti.melt$p_value),BETA = as.numeric(gwasmulti.melt$BETA),SE = as.numeric(gwasmulti.melt$SE),PHENO = gwasmulti.melt$color)
   }
   d <- subset(d, (is.numeric(CHR) & is.numeric(BP) & is.numeric(P)))
   d <- d[order(d$CHR, d$BP), ]
   d$logp <- round(-log10(d$P),3)
+  d$BETA <- round(d$BETA,3)
   d$logp[is.infinite(d$logp)] <- max(d$logp[!is.infinite(d$logp)],na.rm = TRUE) + 10
   d
 }
@@ -75,11 +94,13 @@ processphegwas <- function(x) {
 #' @param bpdivision Integer value to indicate the base pair divisions. By default it is 100,000 bp. This vis only applciable on a single chromosome view. For entire
 #' @param upperlimit Integer to indicate value of -log10(p) to do the upperlimit. If not given it will take the max -log10(p)
 #' @param geneview This checks for the common genes across the section
+#' @param betaplot This plot the beta instad of pvalue in the yaxis. The heat map layer is based on the pvalue.
 #' chromosoem view the max peak is selected
 #' @author George Gittuuuuu
 #' @examples
 #' x <- list(hdl,ldl,trig,tchol)
-#' y <- processphegwas(x)
+#' phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
+#' y <- processphegwas(x, phenos)
 #' ## pass the dataframe from the processphegwas
 #'
 #' # 3D landscape visualization of all the phenotypes across the base pair positions
@@ -93,8 +114,9 @@ processphegwas <- function(x) {
 #'
 #' # 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
 #' landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
+#' landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000, betaplot = TRUE)
 #' @export
-landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, upperlimit = NULL,geneview = FALSE) {
+landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, upperlimit = NULL,geneview = FALSE,betaplot = FALSE) {
 
   if (chromosome == FALSE) {
     print("Processing for the entire chromosome")
@@ -120,14 +142,19 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
     for (i in 1:nrow(gwas_surface_copy_full_use)) {
       for (j in 1:ncol(gwas_surface_copy_full_use))
         gwas_surface_copy_full_use[i, j] <-
-          paste("Phenotype = ", rownames(gwas_surface_copy_full_use)[i], '\n',"Chromosome = ", colnames(gwas_surface_copy_full_use)[j],'\n',"-log10 (P-value) = ", gwas_surface_copy_full_use[i, j],'\n',
+          paste("Phenotype = ", rownames(gwas_surface_copy_full_use)[i], '\n',"Chromosome = ", colnames(gwas_surface_copy_full_use)[j],'\n',
+                "A1 =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$A1,' ',
+                "A2 =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$A2,'\n',
+                "Effect Size =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$BETA,' ',
+                "SE =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$SE,'\n',
+                "-log10 (P-value) = ", gwas_surface_copy_full_use[i, j],'\n',
                 "SNPID =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$SNP,'\n',
                 "Gene =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$gene)
     }
 
     p <- plot_ly(x=colnames(gwas_surface_full_use),y= rownames(gwas_surface_full_use),z = gwas_surface_full_use) %>%
       add_surface(cmin = sliceval,cmax = upperlimit,opacity=.95,surfacecolor = gwas_surface_full_use,text = gwas_surface_copy_full_use,hoverinfo = "text") %>%
-      layout(title = 'FIGIWAS',scene = list(yaxis = list(title = "Phenotypes", tickmode = "array",nticks = 8),xaxis =list(title= "Chromosomes",autotick = F, dtick = 1),
+      layout(title = 'PheGWAS',scene = list(yaxis = list(title = "Phenotypes", tickmode = "array",nticks = 8),xaxis =list(title= "Chromosomes",autotick = F, dtick = 1),
                                               zaxis =list(title= "-log 10(P)",range=c(sliceval,upperlimit+2)),aspectmode = "manual",aspectratio = list( x = 1.8, y = 1, z = 1))) %>%
       add_trace(x=colnames(gwas_surface_prime_full_use),y= rownames(gwas_surface_prime_full_use),z = gwas_surface_prime_full_use, type = "surface",surfacecolor = gwas_surface_full_use,showscale = FALSE,
                 text = gwas_surface_copy_full_use,hoverinfo = "text",cmin = sliceval,cmax = upperlimit) %>% colorbar(title = "-log10 (P-value)")
@@ -173,7 +200,14 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
     for (i in 1:nrow(gwas_surface_copy_use)) {
       for (j in 1:ncol(gwas_surface_copy_use))
         gwas_surface_copy_use[i, j] <-
-          paste("Phenotype = ", rownames(gwas_surface_copy_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_copy_use)[j],'\n',"-log10 (P-value) = ", gwas_surface_copy_use[i, j],'\n',"SNPID =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$SNP,"\n","Gene =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$gene)
+          paste("Phenotype = ", rownames(gwas_surface_copy_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_use)[j],'\n',
+                "A1 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$A1,' ',
+                "A2 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$A2,'\n',
+                "Effect Size =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_use)[j],]$BETA,' ',
+                "SE =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$SE,'\n',
+                "-log10 (P-value) = ", gwas_surface_copy_use[i, j],'\n',
+                "SNPID =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$SNP,"\n",
+                "Gene =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$gene)
     }
 
     #### the new surfece for gene logic
@@ -218,11 +252,58 @@ if(geneview == TRUE){
   surfacecolourheat = gwas_surface_use
 }
 
+    if(betaplot == TRUE){
+
+      gwas_surface_beta <- gwas_surface_use
+      for (i in 1:nrow(gwas_surface_copy_use)) {
+        for (j in 1:ncol(gwas_surface_copy_use))
+          gwas_surface_beta[i, j] <-
+            gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_use)[j],]$BETA
+      }
+
+      gwas_surface_prime_use_beta <- gwas_surface_beta
+      sliceval = min(gwas_surface_beta)
+      upperlimit = max(gwas_surface_beta)
+      gwas_surface_prime_use_beta[,]=  upperlimit
+      gwas_surface_beta_use <- gwas_surface_beta
+
+      for (i in 1:nrow(gwas_surface_beta_use)) {
+        for (j in 1:ncol(gwas_surface_beta_use))
+          gwas_surface_beta_use[i, j] <-
+            paste("Phenotype = ", rownames(gwas_surface_beta_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_beta)[j],'\n',
+                  "A1 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta_use)[j],]$A1,' ',
+                  "A2 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta_use)[j],]$A2,'\n',
+                  "EffectSize =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta)[j],]$BETA,' ',
+                  "SE =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta_use)[j],]$SE,'\n',
+                  "-log10 (P-value) = ", gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta)[j],]$logp,'\n',
+                  "SNPID =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta_use)[j],]$SNP,"\n",
+                  "Gene =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_beta_use)[i]& gwasmulti$lab==colnames(gwas_surface_beta_use)[j],]$gene)
+      }
+
+      colorheatmap = NULL
+      surfacecolourheat = gwas_surface_beta
+
+      p <- plot_ly() %>%
+        layout(title = 'PheGWAS',scene = list(yaxis = list(title = "Phenotypes")
+                                              ,xaxis =list(title= "100 kbp divisions" ,
+                                                           type = 'category',tickmode = "array",tickvals = colnames(gwas_surface_beta), ticks = "outside"),
+                                              zaxis =list(title= "Effect size",range=c(sliceval, upperlimit)),aspectmode = "manual",
+                                              aspectratio = list( x = 2.5, y = 1, z = 1)))
+
+      p <- p %>% add_surface(x=colnames(gwas_surface_beta),y= rownames(gwas_surface_beta),z = gwas_surface_beta,opacity=.98,
+                             surfacecolor = gwas_surface_beta, cmin = sliceval ,cmax = upperlimit,
+                             showscale = FALSE,text = gwas_surface_beta_use,hoverinfo = "text") %>%
+        add_trace(x=colnames(gwas_surface_beta),y= rownames(gwas_surface_beta),z = gwas_surface_prime_use_beta,
+                  type = "surface",surfacecolor = surfacecolourheat,showscale = FALSE,text = gwas_surface_beta_use,hoverinfo = "text",colorscale = colorheatmap)
+      p
+
+    } else{
+
     p <- plot_ly() %>%
-      layout(title = 'FIGIWAS',scene = list(yaxis = list(title = "Phenotypes")
+      layout(title = 'PheGWAS',scene = list(yaxis = list(title = "Phenotypes")
                                             ,xaxis =list(title= "100 kbp divisions" ,
                                                          type = 'category',tickmode = "array",tickvals = colnames(gwas_surface_use), ticks = "outside"),
-                                            zaxis =list(title= "-log 10(P)",autotick = F, dtick = 5,range=c(sliceval,upperlimit + 2)),aspectmode = "manual",
+                                            zaxis =list(title= "-log 10(P)",range=c(sliceval,upperlimit + 2)),aspectmode = "manual",
                                             aspectratio = list( x = 2.5, y = 1, z = 1)))
 
     p <- p %>% add_surface(x=colnames(gwas_surface_use),y= rownames(gwas_surface_use),z = gwas_surface_use,opacity=.98,
@@ -231,7 +312,7 @@ if(geneview == TRUE){
       add_trace(x=colnames(gwas_surface_use),y= rownames(gwas_surface_use),z = gwas_surface_prime_use,
                 type = "surface",surfacecolor = surfacecolourheat,showscale = FALSE,text = gwas_surface_copy_use,hoverinfo = "text",colorscale = colorheatmap)
     p
-  }
+  }}
   p
 }
 
@@ -252,7 +333,8 @@ if(geneview == TRUE){
 #' @examples
 #' # table of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
 #' x <- list(hdl,ldl,trig,tchol)
-#' y <- processphegwas(x)
+#' phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
+#' y <- processphegwas(x, phenos)
 #' landscapetable(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
 #' @export
 landscapetable <- function(d, sliceval = 8, chromosome=1, bpdivision= 1000000) {
