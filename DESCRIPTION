@@ -16,7 +16,11 @@ Imports:
         dplyr (>= 0.8.3),
         plotly (>= 4.8.0),
         biomaRt (>= 2.36.1),
-        reshape2 (>= 1.4.3)
+        reshape2 (>= 1.4.3),
+        httr (>= 1.4.1),
+        jsonlite (>= 1.6),
+        xml2(>= 1.2.2),
+        stringr(>= 1.4.0)
 Suggests: 
     knitr,
     rmarkdown

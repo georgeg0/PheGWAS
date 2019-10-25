@@ -3,3 +3,6 @@
 ^\.git$
 ^\.github$
 .Rprofile
+.RDataTmp
+^doc$
+^Meta$

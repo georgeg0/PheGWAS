@@ -20,11 +20,13 @@ chromosoem view the max peak is selected}
 3-D association table for many phenotypes
 }
 \examples{
+\dontrun{
 # table of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
 x <- list(hdl,ldl,trig,tchol)
 phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
 y <- processphegwas(x, phenos)
 landscapetable(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
+}
 }
 \author{
 George Gittu

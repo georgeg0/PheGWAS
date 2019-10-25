@@ -5,7 +5,9 @@
 \title{Interactive 3-D association landscape for many phenotypes}
 \usage{
 landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
-  upperlimit = NULL, geneview = FALSE, betaplot = FALSE)
+  upperlimit = NULL, geneview = FALSE, betaplot = FALSE,
+  LDblock = NULL, calculateLD = FALSE, pop = "GBR", R2 = 0.75,
+  D = 0.75, mutualLD = FALSE, levelsdown = 0)
 }
 \arguments{
 \item{d}{DataFrame output from processphegwas}
@@ -20,13 +22,28 @@ landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
 
 \item{geneview}{This checks for the common genes across the section}
 
-\item{betaplot}{This plot the beta instad of pvalue in the yaxis. The heat map layer is based on the pvalue.
+\item{betaplot}{This plot the beta instad of pvalue in the yaxis. The heat map layer is based on the pvalue.}
+
+\item{LDblock}{If want to pass a custom LDblock file for division of BP groups (applicable only for chromosomal level)}
+
+\item{calculateLD}{This shoudld be set to true if the calcualte LD logic needed to be added to the plot}
+
+\item{pop}{The population to select for calculation the LD (default GB)}
+
+\item{R2}{The value to set to calculate LD}
+
+\item{D}{THe value to set to calcualte LD}
+
+\item{mutualLD}{Calcualte the mutual LD SNP between the phenotypes}
+
+\item{levelsdown}{Used to find the independant signals
 chromosoem view the max peak is selected}
 }
 \description{
 Interactive 3-D association landscape for many phenotypes
 }
 \examples{
+\dontrun{
 x <- list(hdl,ldl,trig,tchol)
 phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
 y <- processphegwas(x, phenos)
@@ -35,16 +52,17 @@ y <- processphegwas(x, phenos)
 # 3D landscape visualization of all the phenotypes across the base pair positions
 landscape(y)
 
-# 3D landscape visualization of all the phenotypes across the base pair positions, showing only the crusts above a certain threshold
+# Showing only the crusts above a certain threshold
 landscape(y,sliceval = 6)
 
 # 3D landscape visualization of chromosome number 16
 landscape(y,sliceval = 6,chromosome = 16)
 
-# 3D landscape visualization of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
+# 3D landscape visualization of chromosome number 16, with bp division on 1,000,000
 landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
 landscape(y,sliceval = 6,chromosome = 16,bpdivision = 1000000, betaplot = TRUE)
 }
+}
 \author{
-George Gittuuuuu
+George Gittu
 }
