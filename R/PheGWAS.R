@@ -206,6 +206,7 @@ landscape <- function(d, sliceval = 0, chromosome=FALSE, bpdivision= 1000000, up
       for (j in 1:ncol(gwas_surface_copy_full_use))
         gwas_surface_copy_full_use[i, j] <-
           paste("Phenotype = ", rownames(gwas_surface_copy_full_use)[i], '\n',"Chromosome = ", colnames(gwas_surface_copy_full_use)[j],'\n',
+                "BP =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$BP,"\n",
                 "A1 =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$A1,' ',
                 "A2 =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$A2,'\n',
                 "Effect Size =",gwasmultifull[gwasmultifull$PHENO==rownames(gwas_surface_copy_full_use)[i]& gwasmultifull$CHR==colnames(gwas_surface_copy_full_use)[j],]$BETA,' ',
@@ -370,6 +371,7 @@ gsub('(.{1,90})(\\s|$)', '\\1\n', paste("With other pheno: ",gwasmulti[gwasmulti
         }else{
         gwas_surface_copy_use[i, j] <-
           paste("Phenotype = ", rownames(gwas_surface_copy_use)[i], '\n',"kbp position range= ", colnames(gwas_surface_use)[j],'\n',
+                "BP =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$BP,"\n",
                 "A1 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$A1,' ',
                 "A2 =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_copy_use)[j],]$A2,'\n',
                 "Effect Size =",gwasmulti[gwasmulti$PHENO==rownames(gwas_surface_copy_use)[i]& gwasmulti$lab==colnames(gwas_surface_use)[j],]$BETA,' ',
