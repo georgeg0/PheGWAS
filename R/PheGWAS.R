@@ -253,9 +253,9 @@ if (is.null(LDblock)){
       group_by(lab) %>%
       filter(logp > sliceval)
 
-    gwasmulti$snpsinld <- NA
-    gwasmulti$snpsinldcount <- NA
-    gwasmulti$snpsinldup <- NA
+    gwasmulti$snpsinld <- "NA"
+    gwasmulti$snpsinldcount <- 0
+    gwasmulti$snpsinldup <- "NA"
     z<-NULL
 
     for (i in 1:nrow(gwasmulti)) {
@@ -280,7 +280,7 @@ if (is.null(LDblock)){
       }
     }
 if(mutualLD){
-  gwasmulti$common <- NA
+  gwasmulti$common <- "NA"
     for(i in unique(gwasmulti$lab)){
       for (j in 1:length(phenos)) {
         for (k in phenos[-j]) {
@@ -290,7 +290,7 @@ if(mutualLD){
         uuu <- lapply(uuu, str_trim)
         unld <- intersect(append(unlist(uuu),toString(gwasmulti[gwasmulti$lab == i & gwasmulti$PHENO == phenos[j], ]$SNP)), append(unlist(vfg), toString(gwasmulti[gwasmulti$lab == i & gwasmulti$PHENO == k, ]$SNP)))
         if(length(unld)== 0){
-          unld <- NA
+          unld <- "NA"
         }
         z <- c(z,paste(phenos[j],"with",k,":" ,paste0(toString(unld)), collapse = "," ))
         }
