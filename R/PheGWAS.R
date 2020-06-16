@@ -11,18 +11,18 @@ addgene <- function(gwasmulti){
 
   human = useMart(biomart="ENSEMBL_MART_ENSEMBL", host="feb2014.archive.ensembl.org", path="/biomart/martservice", dataset="hsapiens_gene_ensembl")
 
-  gwasmulti$gene <- NA
+  gwasmulti$gene <- "NA"
   for(i in rownames(gwasmulti)){
     xx <- getBM(attributes=c( "ensembl_gene_stable_id"),filters="snp_filter", values=gwasmulti[i, "SNP"],mart=ensembl, uniqueRows=TRUE)
     if (nrow(xx) == 0){
-      gwasmulti[i,]$gene <- NA
+      gwasmulti[i,]$gene <- "NA"
     }else{
       gene <- getBM(attributes = c("hgnc_symbol"),
                     filters = "ensembl_gene_id", values = unlist(xx), mart = human)
-      gwasmulti[i,]$gene <- if (nrow(gene) == 0) NA else  toString( unlist(gene))
+      gwasmulti[i,]$gene <- if (nrow(gene) == 0) "NA" else  toString( unlist(gene))
     }}
   print("Finished mapping")
-  gwasmulti
+  return(gwasmulti)
 }
 
 #' Prepare the dataframe to pass to landscape function
@@ -118,6 +118,14 @@ processphegwas <- function(x,phenos) {
   }else{
     ## Gene when not addded
     print("Gene will be added as part of BioMart module")
+    fullinterm <- fulldf
+    ##Doing the merge of columns
+    for(i in 1:length(x))
+    {
+      cccc <- colnames(fullinterm)[grepl( phenos[i], names( fullinterm ) ) ]
+      fullinterm <- unite_(fullinterm,phenos[i], cccc, sep = "and", remove = FALSE)
+    }
+    fulldfff <- fullinterm[, -grep("_", colnames(fullinterm))]
     gwasmulti.meltF <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","A1","A2"), variable.name = "color", value.name = "Entire_Val")
     gwasmulti.melt <- gwasmulti.meltF %>% separate(Entire_Val, c("BETA", "SE","p_value"), "and")
     d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, A1 = gwasmulti.melt$A1, A2 = gwasmulti.melt$A2, SNP = gwasmulti.melt$rsid ,P = as.numeric(gwasmulti.melt$p_value),BETA = as.numeric(gwasmulti.melt$BETA),SE = as.numeric(gwasmulti.melt$SE),PHENO = gwasmulti.melt$color)
