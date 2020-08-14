@@ -95,7 +95,7 @@ processphegwas <- function(x,phenos) {
   #rename the column for not to get duplicate column names
   for(i in 1:length(x))
   {
-    x[[i]] <- x[[i]] %>% rename_at(vars(-(1:5)), ~ paste0(phenos[i],"_",.))
+    x[[i]] <- x[[i]] %>% rename_at(vars(-(1:5)), ~ paste0(phenos[i],"xx_xx",.))
   }
 
   fulldf <- Reduce(function(dtf1, dtf2) merge(dtf1, dtf2, by = c("CHR","BP","rsid","A1","A2"), all = TRUE),x)
@@ -111,7 +111,7 @@ processphegwas <- function(x,phenos) {
       cccc <- colnames(fullinterm)[grepl( phenos[i], names( fullinterm ) ) ]
       fullinterm <- unite_(fullinterm,phenos[i], cccc, sep = "and", remove = FALSE)
     }
-    fulldfff <- fullinterm[, -grep("_", colnames(fullinterm))]
+    fulldfff <- fullinterm[, -grep("xx_xx", colnames(fullinterm))]
     gwasmulti.meltF <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","A1","A2","G"), variable.name = "color", value.name = "Entire_Val")
     gwasmulti.melt <- gwasmulti.meltF %>% separate(Entire_Val, c("BETA", "SE","p_value"), "and")
     d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, A1 = gwasmulti.melt$A1, A2 = gwasmulti.melt$A2, SNP = gwasmulti.melt$rsid ,P = as.numeric(gwasmulti.melt$p_value),BETA = as.numeric(gwasmulti.melt$BETA),SE = as.numeric(gwasmulti.melt$SE),gene = gwasmulti.melt$G,PHENO = gwasmulti.melt$color)
@@ -125,7 +125,7 @@ processphegwas <- function(x,phenos) {
       cccc <- colnames(fullinterm)[grepl( phenos[i], names( fullinterm ) ) ]
       fullinterm <- unite_(fullinterm,phenos[i], cccc, sep = "and", remove = FALSE)
     }
-    fulldfff <- fullinterm[, -grep("_", colnames(fullinterm))]
+    fulldfff <- fullinterm[, -grep("xx_xx", colnames(fullinterm))]
     gwasmulti.meltF <- reshape2::melt(data = fulldfff, id.vars = c("CHR","BP","rsid","A1","A2"), variable.name = "color", value.name = "Entire_Val")
     gwasmulti.melt <- gwasmulti.meltF %>% separate(Entire_Val, c("BETA", "SE","p_value"), "and")
     d <- data.frame(CHR = gwasmulti.melt$CHR, BP = gwasmulti.melt$BP, A1 = gwasmulti.melt$A1, A2 = gwasmulti.melt$A2, SNP = gwasmulti.melt$rsid ,P = as.numeric(gwasmulti.melt$p_value),BETA = as.numeric(gwasmulti.melt$BETA),SE = as.numeric(gwasmulti.melt$SE),PHENO = gwasmulti.melt$color)
