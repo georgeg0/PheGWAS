@@ -2,7 +2,7 @@
 % Please edit documentation in R/PheGWAS.R
 \name{landscapefulltable}
 \alias{landscapefulltable}
-\title{3-D association table for many phenotypes}
+\title{3-D association table for many phenotypes(entire genome)}
 \usage{
 landscapefulltable(d, sliceval = 6, bpdivision = 1e+06)
 }
@@ -15,7 +15,7 @@ landscapefulltable(d, sliceval = 6, bpdivision = 1e+06)
 chromosoem view the max peak is selected}
 }
 \description{
-3-D association table for many phenotypes
+3-D association table for many phenotypes(entire genome)
 }
 \examples{
 \dontrun{

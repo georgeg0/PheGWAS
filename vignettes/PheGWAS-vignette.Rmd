@@ -37,15 +37,6 @@ head(trig)
 head(tchol)
 ```
 
-Following processed summary data are from the giant consortium:
-
-```{r}
-head(bmimen)
-```
-```{r}
-head(bmiwomen)
-```
-
 The dataframe’s are passed to processphegwas function as a list of dataframe’s.
 
 ```{r}
