@@ -5,6 +5,7 @@ GWAS is Genome Wide Association Study which is done on many variants and one phe
 
 More details are found in the preprint: https://www.biorxiv.org/content/10.1101/694794v1. PheGWAS is an ongoing project from Department of Population Health and Genomics, University of Dundee. Efforts are being made to add new features that would make it more beneficial for comprehensive gene-disease association analysis.
 
+
 # Installation:
 ## Prerequisites
 Please Install plotly, devtools and Biomart before installing the PheGWAS package.
@@ -26,24 +27,12 @@ if (!requireNamespace("BiocManager", quietly = TRUE))
 BiocManager::install("biomaRt")
 ```
 ## Installation of PheGWAS package
-If you downloaded the tar version of the package
 ```
-install.packages("<path to the tar>",dependencies = TRUE, repos = NULL)
-```
-Eg:
-```
-install.packages("/Downloads/PheGWAS_0.1.0.tgz",dependencies = TRUE, repos = NULL)
+install_github("georgeg0/PheGWAS")
 ```
 
-Or if you have the unzipped version of the package then
-
-```
-devtools::install("<path to package folder name>", dependencies=TRUE)
-```
-Eg:
-```
-devtools::install("/Downloads/PheGWAS-master",dependencies = TRUE)
-```
+Find vignette here
+https://github.com/georgeg0/PheGWAS/blob/master/vignettes/PheGWAS-vignette.html
 
 # Brief Documentation:
 ## Interactive PheGWAS landscape mode features:
