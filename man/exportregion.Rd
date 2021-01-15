@@ -4,8 +4,7 @@
 \alias{exportregion}
 \title{Prepare the dataframe to pass to landscape function}
 \usage{
-exportregion(x, phenos, chromosome = NULL, lab = NULL,
-  LDblock = NULL)
+exportregion(x, phenos, chromosome = NULL, lab = NULL, LDblock = NULL)
 }
 \arguments{
 \item{x}{List of dataframes that need to do PheGWAS on. Arrange the dataframe in the order how the the phenotypes should align in y axis}

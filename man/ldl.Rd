@@ -4,14 +4,16 @@
 \name{ldl}
 \alias{ldl}
 \title{LDL GWAS summary dataset (made available from Lipid consortium data files)}
-\format{A dataframe with simulated GWAS results (simulated using plink 1.9)
+\format{
+A dataframe with simulated GWAS results (simulated using plink 1.9)
 \itemize{
   \item CHR is the chromosome number
   \item BP is the position of the chromosome
   \item rsid The SNP ID associated with that position and chromsome
   \item LDL is the p_value of the trait
   \item gene is the gene associated with rsid
-}}
+}
+}
 \usage{
 data(ldl)
 }

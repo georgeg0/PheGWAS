@@ -4,10 +4,22 @@
 \alias{landscape}
 \title{Interactive 3-D association landscape for many phenotypes}
 \usage{
-landscape(d, sliceval = 0, chromosome = FALSE, bpdivision = 1e+06,
-  upperlimit = NULL, geneview = FALSE, betaplot = FALSE,
-  LDblock = NULL, calculateLD = FALSE, pop = "GBR", R2 = 0.75,
-  D = 0.75, mutualLD = FALSE, levelsdown = 0)
+landscape(
+  d,
+  sliceval = 0,
+  chromosome = FALSE,
+  bpdivision = 1e+06,
+  upperlimit = NULL,
+  geneview = FALSE,
+  betaplot = FALSE,
+  LDblock = NULL,
+  calculateLD = FALSE,
+  pop = "GBR",
+  R2 = 0.75,
+  D = 0.75,
+  mutualLD = FALSE,
+  levelsdown = 0
+)
 }
 \arguments{
 \item{d}{DataFrame output from processphegwas}

@@ -2,6 +2,7 @@
 
 export(exportregion)
 export(landscape)
+export(landscapefulltable)
 export(landscapetable)
 export(processphegwas)
 import(dplyr)

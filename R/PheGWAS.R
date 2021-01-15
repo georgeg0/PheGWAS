@@ -571,3 +571,85 @@ if(nrow(gwasmulti) == 0){
     ))
   p
 }
+
+#' 3-D association table for many phenotypes(entire genome)
+#'
+#' @import tidyverse
+#' @import tidyr
+#' @import plotly
+#' @importFrom biomaRt useMart getBM
+#' @import reshape2
+#' @param d DataFrame output from processphegwas
+#' @param sliceval Integer to indicate value of -log10(p) to do the sectionalcut. Usually value > -log10 6 is considered to be significant
+#' @param bpdivision Integer value to indicate the base pair divisions. By default it is 100,000 bp. This vis only applciable on a single chromosome view. For entire
+#' chromosoem view the max peak is selected
+#' @author George Gittu
+#' @examples
+#' \dontrun{
+#' # table of chromosome number 16, with bp division on 1,000,000 (default is 1,000,000)
+#' x <- list(hdl,ldl,trig,tchol)
+#' phenos <- c("HDL","LDL","TRIGS","TOTALCHOLESTROL")
+#' y <- processphegwas(x, phenos)
+#' landscapetable(y,sliceval = 6,chromosome = 16,bpdivision = 1000000)
+#' }
+#' @export
+landscapefulltable <- function (d, sliceval = 6, bpdivision = 1e+06)
+{
+  values = list()
+  for(chromosome in 1:22 )
+  {
+    paste0("Processing for the chromosome number ", chromosome)
+    dchrom1initial <- d[d$CHR == chromosome, ]
+    dchrom1initial$lab <- as.integer(dchrom1initial$BP/bpdivision,
+                                     0)
+    gwasmulti <- dchrom1initial %>% group_by(lab) %>% filter(any(logp >
+                                                                   sliceval)) %>% ungroup() %>% group_by(lab, PHENO) %>%
+      slice(which.max(logp))
+    if (nrow(gwasmulti) == 0) {
+      print("There are no SNP'S above this logp threshold, try decreasing the logp value")
+    }
+    if (length(grep("gene", colnames(d))) == 0) {
+      print("Applying BioMArt module for matching gene to rsid")
+      gwasmulti <- addgene(gwasmulti)
+    }
+    table <- gwasmulti
+    CCCC <- table %>% group_by(lab) %>% filter(logp > sliceval) %>%
+      summarise(CHR = paste(unique(CHR), collapse = " "), MarkerName = paste(SNP,
+                                                                             collapse = " "), GX = paste(gene, collapse = ";"),
+                AssociatedTraits = paste(PHENO, collapse = " "),
+                P_value = paste(P, collapse = " "), logP_value = paste(round(logp,
+                                                                             2), collapse = " "))
+    vvv <- function(x) {
+      if (length(unlist(strsplit(x[2][!is.na(x[2])], ","))) >
+          1) {
+        paste(unique(unlist(strsplit(x[1][!is.na(x[1])],
+                                     ";"))[duplicated(unlist(strsplit(x[1][!is.na(x[1])],
+                                                                      ";")))]), collapse = " ")
+      }
+      else {
+        paste(unique(unlist(strsplit(x[1][!is.na(x[1])],
+                                     ";"))), collapse = " ")
+      }
+    }
+    if(nrow(CCCC) != 0) {
+      CCCC$Genes <- apply(CCCC[, 4:5], 1, vvv)
+      drops <- c("GX")
+      CCCC <- CCCC[, !(names(CCCC) %in% drops)]
+      values[[chromosome]] <- rbind(CCCC$CHR, CCCC$lab, CCCC$MarkerName, CCCC$AssociatedTraits,
+                                    CCCC$Genes, CCCC$P_value, CCCC$logP_value)
+    }
+  }
+  big_data = do.call(cbind, values)
+  p <- plot_ly(type = "table", columnorder = c(1, 2, 3, 4,
+                                               5, 6, 7), columnwidth = c(7, 15, 60, 60, 100, 55, 45),
+               header = list(values = c("<b>Chr</b>", "<b>Position group (Mb)</b>",
+                                        "<b>Marker Name</b>", "<b>Associated Traits</b>",
+                                        "<b>Genes</b>", "<b>P-Values</b>", "<b>-log10 (P-value)</b>"),
+                             line = list(color = "#506784"), fill = list(color = "blue"),
+                             align = c("left", "center"), font = list(color = "white",
+                                                                      size = 12), height = 40), cells = list(values = big_data,
+                                                                                                             line = list(color = "#506784"), fill = list(color = c("lightblue")),
+                                                                                                             align = c("left", "center"), font = list(color = c("black"),
+                                                                                                                                                      size = 12), height = 30))
+  p
+}
